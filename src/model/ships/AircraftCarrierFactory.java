@@ -1,7 +1,7 @@
 package model.ships;
 
 public class AircraftCarrierFactory implements ShipFactory {
-    public Ship makeShip(){
+    public AircraftCarrier makeShip(){
         AircraftCarrier aircraftCarrier = new AircraftCarrier();
         return aircraftCarrier;
     }
