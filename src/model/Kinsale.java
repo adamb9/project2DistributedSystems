@@ -28,6 +28,7 @@ public class Kinsale implements  Serializable {
             // Create an output stream to the server
             ObjectOutputStream toServer = new ObjectOutputStream(socket.getOutputStream());
 
+            //
             Scanner sc= new Scanner(System.in);
             System.out.println("1.Destroyer");
             System.out.println("2.Aircraft Carrier");

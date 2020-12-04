@@ -2,22 +2,51 @@
 
 package model;
 
-import model.bombs.*;
 import model.ships.Ship;
 
-import java.io.*;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.InetAddress;
+import java.rmi.Naming;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.rmi.server.UnicastRemoteObject;
+import java.util.ArrayList;
+import java.util.List;
 
 
-public class Blarney implements Serializable {
-    private ObjectOutputStream outputToFile;
-    private ObjectInputStream inputFromClient;
+public class Blarney extends UnicastRemoteObject implements ListenerInterface {
+    //private ObjectOutputStream outputToFile;
+    //private ObjectInputStream inputFromClient;
 
-    public static void main(String[] args){
-        new Blarney();
+    protected Blarney() throws RemoteException{
+    };
+
+
+    @Override
+    public void shipSighted(Ship ship) throws RemoteException {
+        System.out.println("Ship sighting event: " + ship.function());
     }
 
+
+    public static void main(String[] args){
+        try
+        {
+            //Lookup for the service
+            String url = "rmi://" + InetAddress.getLocalHost().getHostAddress() + ":52369/Hello";
+            Remote lRemote = Naming.lookup(url);
+            Sentry lRemoteServer = (Sentry) lRemote;
+
+            //Create Blarney and register it as a Listener
+            Blarney blarney = new Blarney();
+            lRemoteServer.addListener(blarney);
+        }
+        catch (Exception aInE)
+        {
+            System.out.println(aInE);
+        }
+    }
+
+
+    /*
     public Blarney() {
         try {
             // Create a server socket
@@ -61,6 +90,8 @@ public class Blarney implements Serializable {
             }
         }
     }
+    */
+
 
     @Override
     public String toString() {
