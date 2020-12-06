@@ -25,7 +25,7 @@ public class Youghal extends UnicastRemoteObject implements Sentry, Runnable {
     private Ship ship;
 
     private Youghal() throws RemoteException{
-        ship = new Destroyer();
+
     }
 
     @Override
@@ -52,7 +52,7 @@ public class Youghal extends UnicastRemoteObject implements Sentry, Runnable {
             }
 
             try {
-                Thread.sleep(5000);
+                Thread.sleep(3000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -95,6 +95,7 @@ public class Youghal extends UnicastRemoteObject implements Sentry, Runnable {
     public static void main(String[] args) {
         try
         {
+            System.out.println("Youghal server started");
             Youghal lServer = new Youghal();
             // Binding the remote object (stub) in the registry
             Registry reg = LocateRegistry.createRegistry(52369);
@@ -102,7 +103,6 @@ public class Youghal extends UnicastRemoteObject implements Sentry, Runnable {
 
             Naming.rebind(url, lServer);
 
-            //Create the thread and change the temperature
             Thread lThread = new Thread(lServer);
             lThread.start();
 
