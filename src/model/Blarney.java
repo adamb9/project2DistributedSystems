@@ -1,3 +1,7 @@
+//ADAM BALDWIN
+//R00176025
+//SDH3-A
+
 //CENTRAL SITE
 
 package model;
@@ -7,24 +11,26 @@ import model.ships.Ship;
 import java.io.*;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.UnknownHostException;
 import java.rmi.Naming;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Scanner;
+
 
 
 public class Blarney extends UnicastRemoteObject implements ListenerInterface {
-
+    //List that contains all ships sent from remote sites
+    private List<Ship> list = Collections.synchronizedList(new ArrayList<Ship>());
 
     protected Blarney() throws RemoteException{
     }
 
 
-    public static void socketImpl(){
+    public static void socketImpl(List<Ship> list){
+        //Create object input and output streams
         ObjectOutputStream outputToFile;
         ObjectInputStream inputFromClient;
         try {
@@ -33,8 +39,7 @@ public class Blarney extends UnicastRemoteObject implements ListenerInterface {
             Socket socket = new Socket(host, 8001);
 
             // Create an object ouput stream
-            outputToFile = new ObjectOutputStream(
-                    new FileOutputStream("blarney.dat", true));
+            outputToFile = new ObjectOutputStream(new FileOutputStream("blarney.dat", true));
 
             while (true) {
                 // Create an input stream from the socket
@@ -44,10 +49,12 @@ public class Blarney extends UnicastRemoteObject implements ListenerInterface {
                 Object object = inputFromClient.readObject();
                 System.out.println("Ship sighting event: " + object.toString());
 
-                // Write to the file
+                // Write to the file and add to list
+                Ship ship = (Ship) object;
+                list.add(ship);
+
                 outputToFile.writeObject(object);
                 System.out.println("Socket: Ship stored");
-
 
             }
         }
@@ -60,7 +67,7 @@ public class Blarney extends UnicastRemoteObject implements ListenerInterface {
         try
         {
             //Lookup for the service
-            String url = "rmi://" + InetAddress.getLocalHost().getHostAddress() + ":52369/Hello";
+            String url = "rmi://" + InetAddress.getLocalHost().getHostAddress() + ":52369/Ship";
             Remote lRemote = Naming.lookup(url);
             Sentry lRemoteServer = (Sentry) lRemote;
 
@@ -82,13 +89,16 @@ public class Blarney extends UnicastRemoteObject implements ListenerInterface {
 
     public void storeShip(Ship ship){
         try {
-            FileOutputStream fileOut =
-                    new FileOutputStream("./blarney.dat");
+            //Stores the ship as a serialised object into blarney.dat
+            FileOutputStream fileOut = new FileOutputStream("./blarney.dat");
             ObjectOutputStream out = new ObjectOutputStream(fileOut);
             out.writeObject(ship);
             out.close();
             fileOut.close();
             System.out.println("RMI: Ship stored");
+            //Adding ship to the shared list of ship objects
+            list.add(ship);
+
         } catch (IOException i) {
             i.printStackTrace();
         }
@@ -96,23 +106,10 @@ public class Blarney extends UnicastRemoteObject implements ListenerInterface {
 
 
     public static void main(String[] args){
+        List<Ship> list = Collections.synchronizedList(new ArrayList<Ship>());
         rmiImpl();
-        socketImpl();
+        socketImpl(list);
 
-        /*
-        Scanner sc = new Scanner(System.in);
-        System.out.println("1.RMI\n2.Sockets");
-        int method = sc.nextInt();
-
-        if(method==1) {
-            rmiImpl();
-        }
-        else if(method==2) {
-            socketImpl();
-        }
-        else{
-            System.out.println("Error. Enter either 1 or 2 please!");
-        }*/
     }
 
 

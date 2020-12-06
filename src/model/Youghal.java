@@ -1,3 +1,7 @@
+//ADAM BALDWIN
+//R00176025
+//SDH3-A
+
 //RMI REMOTE SITE
 
 package model;
@@ -37,6 +41,8 @@ public class Youghal extends UnicastRemoteObject implements Sentry, Runnable {
             System.out.println("3.Sailing Ship");
             int selectedShip = sc.nextInt();
 
+            //User input determines which ship is spotted at remote site
+
             if (selectedShip == 1) {
                 DestroyerFactory destroyerFactory = new DestroyerFactory();
                 Destroyer destroyer = destroyerFactory.makeShip();
@@ -52,10 +58,12 @@ public class Youghal extends UnicastRemoteObject implements Sentry, Runnable {
             }
 
             try {
-                Thread.sleep(3000);
+                Thread.sleep(2000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            //Listeners (only blarney in this case) are notified of the ship being sighted
             notifyListeners(ship);
         }
     }
@@ -63,6 +71,7 @@ public class Youghal extends UnicastRemoteObject implements Sentry, Runnable {
 
     private void notifyListeners(Ship sightedShip)
     {
+        //Listeners (only blarney in this case) are notified of the ship being sighted
         for (ListenerInterface lListener : listeners)
         {
             try
@@ -86,10 +95,7 @@ public class Youghal extends UnicastRemoteObject implements Sentry, Runnable {
         listeners.remove(listener);
     }
 
-    @Override
-    public Ship getShip() throws RemoteException {
-        return ship;
-    }
+
 
 
     public static void main(String[] args) {
@@ -97,12 +103,14 @@ public class Youghal extends UnicastRemoteObject implements Sentry, Runnable {
         {
             System.out.println("Youghal server started");
             Youghal lServer = new Youghal();
+
             // Binding the remote object (stub) in the registry
             Registry reg = LocateRegistry.createRegistry(52369);
-            String url = "rmi://" + InetAddress.getLocalHost().getHostAddress() + ":52369/Hello";
+            String url = "rmi://" + InetAddress.getLocalHost().getHostAddress() + ":52369/Ship";
 
             Naming.rebind(url, lServer);
 
+            //Making a youghal thread
             Thread lThread = new Thread(lServer);
             lThread.start();
 
@@ -113,13 +121,5 @@ public class Youghal extends UnicastRemoteObject implements Sentry, Runnable {
         }
 
     }
-
-
-
-    @Override
-    public String toString() {
-        return "Youghal";
-    }
-
 
 }
